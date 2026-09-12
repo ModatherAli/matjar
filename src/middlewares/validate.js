@@ -10,7 +10,12 @@ export function validate(schema, source = "body") {
       }));
       return next(ApiError.badRequest("Validation failed", details));
     }
-    req[source] = result.data;
+    Object.defineProperty(req, source, {
+      value: result.data,
+      writable: true,
+      enumerable: true,
+      configurable: true,
+    });
     return next();
   };
 }

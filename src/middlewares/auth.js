@@ -1,6 +1,5 @@
-import jwt from "jsonwebtoken";
-import { env } from "../config/env.js";
 import { ApiError } from "../utils/ApiError.js";
+import { verifyAccessToken } from "../utils/tokens.js";
 
 export function auth(req, _res, next) {
   const header = req.headers.authorization ?? "";
@@ -9,7 +8,7 @@ export function auth(req, _res, next) {
     return next(ApiError.unauthorized("Missing or invalid Authorization header"));
   }
   try {
-    const payload = jwt.verify(token, env.jwtAccessSecret);
+    const payload = verifyAccessToken(token);
     req.user = { id: payload.sub, role: payload.role };
     return next();
   } catch {
