@@ -1,7 +1,5 @@
-# Matjar E-commerce API
 # Matjar (متجر) — Full-Stack E-Commerce Platform
 
-REST backend for an e-commerce store built with Node.js, Express 5 and PostgreSQL (via Prisma 7).
 <p align="center">
   <img src="https://img.shields.io/badge/Flutter-3.x-02569B?style=for-the-badge&logo=flutter&logoColor=white" alt="Flutter" />
   <img src="https://img.shields.io/badge/Dart-3.x-0175C2?style=for-the-badge&logo=dart&logoColor=white" alt="Dart" />
@@ -13,45 +11,27 @@ REST backend for an e-commerce store built with Node.js, Express 5 and PostgreSQ
   <img src="https://img.shields.io/badge/Swagger-OpenAPI%203.0-85EA2D?style=for-the-badge&logo=swagger&logoColor=black" alt="Swagger" />
 </p>
 
-## Stack
 ---
 
-- Node.js 24 (ESM) + Express 5
-- PostgreSQL + Prisma 7 (`@prisma/adapter-pg`)
-- JWT access (15m) + refresh (7d) tokens, bcrypt passwords
-- Zod validation, helmet / CORS / rate-limit, multer uploads
-- Swagger UI at `/api-docs`
 ## 🌟 Executive Summary
 
-## Prerequisites
-**Matjar** (*Arabic for "The Store"*) is an end-to-end, production-ready luxury e-commerce ecosystem. It couples a cross-platform mobile application built with **Flutter 3** and **Riverpod** with an enterprise-grade RESTful API powered by **Node.js (ESM)**, **Express 5**, and **Prisma 7 on PostgreSQL**.
+**Matjar** (*Arabic for "The Store"*) is an end-to-end, production-grade luxury e-commerce ecosystem. It couples a cross-platform mobile application built with **Flutter 3** and **Riverpod** with an enterprise-grade RESTful API powered by **Node.js (ESM)**, **Express 5**, and **Prisma 7 on PostgreSQL**.
 
-- Node.js 20+ (24 recommended) and npm
-- No local PostgreSQL install needed for development: the project uses
-  `prisma dev`, a local PGlite-backed PostgreSQL server (small npm download).
 Engineered with high standards for software craftsmanship, Matjar showcases clean domain-driven architecture, resilient mobile networking with automated JWT lifecycle management, ACID-compliant transactional checkout, strict order lifecycle state machines, and real-time operational analytics for store administrators.
 
-## Quickstart
 ---
 
-```bash
-npm install
 ## 📱 Mobile Experience Showcase
 
-# Terminal 1 - start the local database (keep running)
-npm run db:dev
+The app features a custom warm minimalist design system with editorial typography, skeleton shimmers, and micro-animations.
+
 <div align="center">
 
-# Terminal 2 - first time only: migrate + seed
-npm run prisma:migrate
-npm run prisma:seed
 | **Customer Storefront** | **Auth & Identity** | **Admin Atelier Dashboard** |
 | :---: | :---: | :---: |
-| <img src="screenshots/home.png" width="280" alt="Customer Storefront" /> | <img src="screenshots/login.png" width="280" alt="Authentication Screen" /> | <img src="screenshots/admin_dashbord.png" width="280" alt="Admin Dashboard" /> |
+| <img src="screenshots/home.png" width="270" alt="Customer Storefront" /> | <img src="screenshots/login.png" width="270" alt="Authentication Screen" /> | <img src="screenshots/admin_dashbord.png" width="270" alt="Admin Dashboard" /> |
 | *Editorial luxury feed, category navigation, curated arrivals* | *Dual-token JWT auth, validation feedback, secure storage* | *Real-time revenue, order status breakdowns & inventory operations* |
 
-# Terminal 2 - start the API
-npm run dev
 </div>
 
 ---
@@ -107,24 +87,10 @@ flowchart TB
     Backend -.-> Swagger
 ```
 
-- API: http://localhost:4000
-- Docs: http://localhost:4000/api-docs
-- Seed admin: `admin@matjar.local` / `Admin123!` (override in `.env`)
 ---
 
-## Scripts
 ## ✨ Key Engineering Highlights
 
-| Script | Purpose |
-|---|---|
-| `npm run dev` | API with watch mode |
-| `npm start` | API (production) |
-| `npm run db:dev` | Local Postgres (PGlite) named instance `matjar` |
-| `npm run db:ls` / `db:stop` | List / stop local database servers |
-| `npm run prisma:migrate` | `prisma migrate dev` |
-| `npm run prisma:seed` | Seed admin + sample catalog |
-| `npm run prisma:generate` | Regenerate Prisma Client |
-| `npm run db:push` | Push schema without a migration (dev only) |
 ### 1. Robust Transactional Integrity & Inventory Allocation
 - **Atomic Checkout (`prisma.$transaction`)**: Orders cannot enter an inconsistent state. When a customer initiates checkout, the backend runs a serialized database transaction that:
   1. Validates address ownership and active cart items.
@@ -135,7 +101,6 @@ flowchart TB
 - **Auto-Restocking Lifecycle**: Cancelling a pending or paid order automatically increments stock levels back to the catalog and adjusts refund statuses.
 - **Safe Soft Deactivations**: Products associated with past order histories are prevented from hard deletion; instead, they transition into soft-deactivated states to preserve financial auditing records.
 
-## Environment
 ### 2. Dual-Persona Experience
 - **Customer Storefront**:
   - Editorial curation with smooth animations and skeleton shimmering.
@@ -148,45 +113,19 @@ flowchart TB
   - Full product inventory management with multi-image uploads via `multer`.
   - User role assignment and account deactivation controls.
 
-See `.env.example`. Key variables:
 ### 3. Dual-Token JWT Auth with Silent Refresh
 - **Access Tokens (15m)** and **Refresh Tokens (7d)** signed via cryptographically secure secrets.
 - **Dio Interceptor Queue**: The Flutter client intercepts `401 Unauthorized` responses, buffers pending requests, exchanges the refresh token seamlessly in the background, and retries the original request with zero disruption to the user experience.
 - Passwords hashed using industry-standard **bcrypt** with salted work factors.
 
-| Variable | Purpose |
-|---|---|
-| `DATABASE_URL` | Main connection (local: `postgres://postgres:postgres@localhost:51214/...`) |
-| `SHADOW_DATABASE_URL` | Shadow DB for migrations (`...@localhost:51215/...`) |
-| `PORT` | API port (default 4000) |
-| `JWT_ACCESS_SECRET` / `JWT_REFRESH_SECRET` | Signing secrets (min 32 chars in production) |
-| `ADMIN_EMAIL` / `ADMIN_PASSWORD` / `ADMIN_NAME` | Seeded admin user |
 ### 4. Zero-Friction Local Developer Environment
 - Embeds Prisma 7 local database engine (`prisma dev` backed by **PGlite**), eliminating the requirement of running a local PostgreSQL daemon or Docker container during development.
 - Single command bootstrapper (`npm run dev:all`) that automatically starts the local database, monitors port readiness, and spawns the Express API with file-watch mode.
 
-## Endpoint overview
 ---
 
-All routes are prefixed with `/api/v1`. Responses use `{ success, data }`
-(or `{ success, data, pagination }`); errors use `{ success: false, error }`.
 ## 🛠️ Technology Stack Matrix
 
-| Area | Endpoints |
-|---|---|
-| Auth | `POST /auth/register`, `POST /auth/login`, `POST /auth/refresh`, `POST /auth/logout` |
-| Users | `GET/PUT /users/me`, `PUT /users/me/password` |
-| Admin users | `GET /admin/users`, `GET /admin/users/:id`, `PATCH /admin/users/:id/role`, `PATCH /admin/users/:id/status` |
-| Categories | `GET /categories`, `GET /categories/:slug` |
-| Admin categories | `POST/GET /admin/categories`, `GET/PUT/DELETE /admin/categories/:id` |
-| Products | `GET /products?search&category&minPrice&maxPrice&sort&page&limit`, `GET /products/:slug` |
-| Admin products | `POST/GET /admin/products`, `GET/PUT/DELETE /admin/products/:id`, `POST /admin/products/:id/images`, `DELETE /admin/products/:id/images/:imageId` |
-| Addresses | `GET/POST /addresses`, `GET/PUT/DELETE /addresses/:id` |
-| Cart | `GET /cart`, `POST /cart/items`, `PATCH/DELETE /cart/items/:id`, `DELETE /cart` |
-| Orders | `POST /orders/checkout`, `GET /orders`, `GET /orders/:id`, `POST /orders/:id/cancel` |
-| Admin orders | `GET /admin/orders`, `GET /admin/orders/:id`, `PATCH /admin/orders/:id/status` |
-| Reviews | `GET /products/:id/reviews`, `POST/PUT/DELETE /products/:id/reviews` |
-| Admin | `GET /admin/dashboard` |
 | Domain | Technology | Rationale & Responsibility |
 | :--- | :--- | :--- |
 | **Mobile Client** | **Flutter 3.x & Dart** | Cross-platform native compilation (Android, iOS, Web) with 60+ FPS performance. |
@@ -201,28 +140,12 @@ All routes are prefixed with `/api/v1`. Responses use `{ success, data }`
 | **API Documentation** | **Swagger UI / OpenAPI 3** | Self-documenting interactive API playground accessible at `/api-docs`. |
 | **Security & Headers** | **Helmet, CORS, Rate-Limit** | Protection against brute-force attacks, XSS, MIME sniffing, and clickjacking. |
 
-## Business rules worth knowing
 ---
 
-- Register always creates `CUSTOMER`; only admins change roles (and never their own).
-- Checkout runs in a transaction: stock check, order + item snapshots, stock
-  decrement, cart clear. Empty cart, inactive or out-of-stock products fail with 400.
-- Order flow: `PENDING -> PAID -> SHIPPED -> DELIVERED`, cancellable from
-  `PENDING`/`PAID`. Cancelling restocks items and refunds paid orders.
-- Deleting a product with order history soft-deactivates it instead.
-- Reviews require a delivered purchase of that product, one per customer.
-- Product images upload to `uploads/products/` (5MB max, images only).
 ## 🗄️ Database Entity Relationship Model
 
-## Troubleshooting
 The database schema is designed with strict relational constraints, foreign keys, and indexes for performant querying:
 
-- `prisma dev` hangs on start: a stale lock from a killed process. Stop node
-  processes, delete `server.json` and `server.lock*` under
-  `%LocalAppData%\prisma-dev-nodejs\Data\matjar` (and `durable-streams\matjar`),
-  then run `npm run db:dev` again.
-- Moving to hosted Postgres later: only `DATABASE_URL` changes. The Prisma
-  schema stays `provider = "postgresql"`, so migrations carry over.
 ```mermaid
 erDiagram
     User ||--o{ Address : "registers"
