@@ -13,7 +13,8 @@
     "db:push": "prisma db push",
     "db:dev": "prisma dev --name matjar -p 51213 --db-port 51214 --shadow-db-port 51215",
     "db:ls": "prisma dev ls",
-    "db:stop": "prisma dev stop matjar"
+    "db:stop": "prisma dev stop matjar",
+    "dev:all": "node scripts/dev.js"
   },
   "keywords": [],
   "author": "",
@@ -37,6 +38,7 @@
     "zod": "^4.6.2"
   },
   "devDependencies": {
+    "concurrently": "^10.0.5",
     "nodemon": "^3.1.14",
     "prisma": "^7.10.0"
   }
